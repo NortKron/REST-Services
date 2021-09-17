@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>RestApi_Scoring</name>
+    </assembly>
+    <members>
+        <member name="M:RestApi_Scoring.Controllers.ScoringController.Evaluate(System.Object)">
+            <summary>
+            Mock сервис скоринга, который возвращает решение по заявке
+            </summary>
+            <param name="obj">Json-файл с информацией по кредитной заявке</param> 
+        </member>
+    </members>
+</doc>

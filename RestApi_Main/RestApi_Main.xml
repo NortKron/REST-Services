@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>RestApi_Main</name>
+    </assembly>
+    <members>
+        <member name="T:RestApi_Main.Controllers.ApplicationController">
+            <summary>
+            Контроллер сервиса
+            </summary>
+        </member>
+        <member name="M:RestApi_Main.Controllers.ApplicationController.Create(System.Object)">
+            <summary>
+            Принимает заявку в формате json. 
+            Возвращает уникальный номер и Id принятой заявки в формате json
+            </summary>
+            <param name="obj">Данные по заявке в формате Json</param> 
+            <returns>Возвращает уникальный номер и Id принятой заявки в формате json</returns>
+        </member>
+        <member name="M:RestApi_Main.Controllers.ApplicationController.Status(System.String)">
+            <summary>
+            Возвращает результат рассмотрения заявки
+            </summary>
+            <param name="numApplication">Номер заявки</param>   
+            <returns>Результат рассмотрения заявки в формате json</returns>
+        </member>
+        <member name="M:RestApi_Main.Controllers.ApplicationController.AddJsonDB(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Вносит заявку в БД
+            </summary>
+            <param name="json"> JSon файл с данными заявки </param>   
+            <returns>Уникальный Id заявления </returns>
+        </member>
+    </members>
+</doc>
