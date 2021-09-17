@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using RestApi_Main;
@@ -14,13 +13,12 @@ using RestApi_Main.Models;
 
 namespace RestApi_Main.Controllers
 {
-    /// <summary>
-    /// Контроллер сервиса
-    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class ApplicationController : Controller
     {
+        private const string url = "http://localhost:3000/api/scoring/evaluate";
+
         private readonly DataContext _context;
         private readonly ILogger<ApplicationController> _logger;
 
@@ -37,7 +35,6 @@ namespace RestApi_Main.Controllers
         /// <param name="obj">Данные по заявке в формате Json</param> 
         /// <returns>Возвращает уникальный номер и Id принятой заявки в формате json</returns>
         [HttpPost("create")]
-        //public JsonResult Create(Object obj)
         public async Task<JsonResult> Create(Object obj)
         {
             JObject json = JObject.Parse(obj.ToString());
@@ -45,33 +42,22 @@ namespace RestApi_Main.Controllers
             string applicationNum = (string) json["ApplicationNum"];
             int applicationId = AddJsonDB(json);
 
-
-            //The data that needs to be sent. Any object works.
-            var pocoObject = new
-            {
-                Name = "John Doe",
-                Occupation = "gardener"
-            };
-
-            //Converting the object to a json string. NOTE: Make sure the object doesn't contain circular references.
-            //string jsonSerialized = JsonConvert.SerializeObject(json);
-
-            //Needed to setup the body of the request
-            //StringContent data = new StringContent(jsonSerialized, Encoding.UTF8, "application/json");
             StringContent data = new StringContent(obj.ToString(), Encoding.UTF8, "application/json");
 
-            //The url to post to.
-            var url = "http://localhost:3000/api/scoring/evaluate";
             var client = new HttpClient();
 
-            //Pass in the full URL and the json string content
             var response = await client.PostAsync(url, data);
-
-            //It would be better to make sure this request actually made it through
             string result = await response.Content.ReadAsStringAsync();
 
             json = JObject.Parse(result);
             _logger.LogInformation(">>>> ScoringStatus : " + json["scoringStatus"]);
+
+            // Обновление статуса заявки в БД
+            bool status = (bool) json["scoringStatus"];
+            _context.CreditApplications
+                .Where(x => x.ApplicationNum == applicationNum)
+                .First().ScoringStatus = status;
+            _context.SaveChanges();
 
             //close out the client
             client.Dispose();            
@@ -80,7 +66,7 @@ namespace RestApi_Main.Controllers
             { 
                 Id = applicationId,
                 ApplicationNum = applicationNum,
-                ScoringStatus = json["scoringStatus"]
+                ScoringStatus = status
             });
         }
 
@@ -97,7 +83,7 @@ namespace RestApi_Main.Controllers
                 var clientId = _context.CreditApplications.Where(o => o.ApplicationNum == numApplication).First().ApplicantId;
                 var creditId = _context.CreditApplications.Where(o => o.ApplicationNum == numApplication).First().RequestedCreditId;
 
-                return new JsonResult(new 
+                return Json(new 
                 {
                     Id = _context.CreditApplications.Where(o => o.ApplicationNum == numApplication).First().Id,
                     ApplicationNum = numApplication,
@@ -221,7 +207,8 @@ namespace RestApi_Main.Controllers
             if (_context.CreditApplications.Any(o => o.ApplicationNum == сreditApplication.ApplicationNum))
             {
                 // заявка уже существует
-                сreditApplication.Id = _context.CreditApplications.Where(o => o.ApplicationNum == сreditApplication.ApplicationNum).First().Id;
+                сreditApplication.Id = _context.CreditApplications
+                    .Where(o => o.ApplicationNum == сreditApplication.ApplicationNum).First().Id;
             }
             else
             {

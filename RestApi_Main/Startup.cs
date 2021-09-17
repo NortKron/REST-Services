@@ -27,7 +27,7 @@ namespace RestApi_Main
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        public IConfiguration Configuration { get; set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -53,8 +53,9 @@ namespace RestApi_Main
                 c.IncludeXmlComments(xmlPath);
             });
 
-            services.AddDbContext<DataContext>(options =>
-                options.UseSqlServer(Configuration[CFG_DATA_DB]));
+            services.AddDbContext<DataContext>(options => options.UseSqlServer(Configuration[CFG_DATA_DB]));
+            //services.AddDbContext<DataContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            //services.AddDbContext<DataContext>(options => options.UseSqlServer("Server=LAPTOP-DELL\\SQLEXPRESS; Database=REST_DB; User ID=sa;Password=112233; Trusted_Connection=True;"));
 
             services.AddDbContext<DataContext>();
         }
@@ -74,6 +75,7 @@ namespace RestApi_Main
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
             /*
             // Включениа логгирования
             app.Run(async (context) =>
@@ -86,6 +88,7 @@ namespace RestApi_Main
                 await context.Response.WriteAsync("Hello World!");
             });
             */
+
             app.UseStatusCodePages();
             app.UseStaticFiles();
 

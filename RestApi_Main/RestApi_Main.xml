@@ -4,11 +4,6 @@
         <name>RestApi_Main</name>
     </assembly>
     <members>
-        <member name="T:RestApi_Main.Controllers.ApplicationController">
-            <summary>
-            Контроллер сервиса
-            </summary>
-        </member>
         <member name="M:RestApi_Main.Controllers.ApplicationController.Create(System.Object)">
             <summary>
             Принимает заявку в формате json. 
